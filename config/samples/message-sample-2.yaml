@@ -1,0 +1,13 @@
+apiVersion: message.example.com/v1
+kind: Message
+metadata:
+  labels:
+    app.kubernetes.io/name: message
+    app.kubernetes.io/instance: message-sample
+    app.kubernetes.io/part-of: message-controller
+    app.kuberentes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: message-controller
+  name: message-sample-2
+spec:
+  word: "Controller"
+  number: 8
