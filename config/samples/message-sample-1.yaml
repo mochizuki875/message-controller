@@ -9,5 +9,5 @@ metadata:
     app.kubernetes.io/created-by: message-controller
   name: message-sample-1
 spec:
-  word: "World"
-  number: 5
+  word: "World!!"
+  number: 3

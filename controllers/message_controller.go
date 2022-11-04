@@ -18,6 +18,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -48,8 +49,10 @@ type MessageReconciler struct {
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.13.0/pkg/reconcile
 // MessageReconcilerのメソッドとして定義(controller-runtimeで定義されたインターフェイスに対する実装)
 func (r *MessageReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
+	defer fmt.Println("=== Finish Reconcile ===")
+	fmt.Println("=== Start Reconcile ===")
+
 	log := log.FromContext(ctx)
-	log.Info("=== Start Reconcile ===")
 
 	var message messagev1.Message
 	var err error
@@ -100,14 +103,11 @@ func (r *MessageReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		specNumber = *message.Spec.Number
 	}
 
-	statusNumber := int32(0) // 初期値
-	if message.Status.Number != nil {
-		statusNumber = *message.Status.Number
-	}
+	statusNumber := message.Status.Number
 
 	// specNumberとstatusNumberに差分があればstatusNumberを更新する
 	if specNumber != statusNumber {
-		message.Status.Number = &specNumber
+		message.Status.Number = specNumber
 		numberFlag = true
 	}
 
@@ -118,6 +118,10 @@ func (r *MessageReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			log.Error(err, "Faild to update message.")
 			return ctrl.Result{}, err
 		}
+
+		// Debug
+		log.Info("[Debug] Status.Word: " + message.Status.Word)
+		fmt.Println("[Debug] Status.Word: " + message.Status.Word)
 	}
 
 	return ctrl.Result{}, nil
@@ -125,7 +129,7 @@ func (r *MessageReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *MessageReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	return ctrl.NewControllerManagedBy(mgr).
-		For(&messagev1.Message{}). // reconcile対象のオブジェクトを指定
-		Complete(r)                // controllerがbuildされる
+	return ctrl.NewControllerManagedBy(mgr). // &Builderのメンバーにmgrを登録
+							For(&messagev1.Message{}). // reconcile対象のオブジェクトを指定
+							Complete(r)                // controllerがbuildされる
 }

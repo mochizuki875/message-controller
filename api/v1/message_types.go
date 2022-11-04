@@ -48,7 +48,7 @@ type MessageStatus struct {
 	// Important: Run "make" to regenerate code after modifying this file
 
 	Word   string `json:"word,omitempty"`
-	Number *int32 `json:"number,omitempty"`
+	Number int32  `json:"number,omitempty"`
 }
 
 // +kubebuilder:object:root=true

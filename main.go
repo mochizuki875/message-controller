@@ -69,7 +69,7 @@ func main() {
 	var resyncPeriod = time.Second * 30
 
 	// Managerを初期化
-	// controllerManagerをmanager.Managerでカプセル化したinerfaceが返ってくる
+	// &controllerManagerを内部で作成しmanager.Manager(インターフェイス)でカプセル化したものが返ってくる
 
 	// Options
 	// https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.13.0/pkg/manager#Options
@@ -99,8 +99,9 @@ func main() {
 		os.Exit(1)
 	}
 
+	// ControllerがBuildされてrunnablesに登録される
 	if err = (&controllers.MessageReconciler{
-		Client: mgr.GetClient(), // clientを初期化
+		Client: mgr.GetClient(), // client.Clientを初期化
 		Scheme: mgr.GetScheme(), // schemeを初期化
 	}).SetupWithManager(mgr); err != nil { // message_controller.goで定義されてるやつ(controllerをbuild)
 		setupLog.Error(err, "unable to create controller", "controller", "Message")
